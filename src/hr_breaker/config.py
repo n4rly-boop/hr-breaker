@@ -116,7 +116,7 @@ def get_model_settings() -> dict[str, Any] | None:
 
 def get_pro_model():
     """Get the pro model configured for OpenRouter."""
-    from pydantic_ai.models.openai import OpenAIModel
+    from pydantic_ai.models.openai import OpenAIChatModel
     from pydantic_ai.providers.openai import OpenAIProvider
 
     settings = get_settings()
@@ -124,12 +124,12 @@ def get_pro_model():
         api_key=settings.openai_api_key,
         base_url=settings.openai_base_url,
     )
-    return OpenAIModel(settings.pro_model, provider=provider)
+    return OpenAIChatModel(settings.pro_model, provider=provider)
 
 
 def get_flash_model():
     """Get the flash model configured for OpenRouter."""
-    from pydantic_ai.models.openai import OpenAIModel
+    from pydantic_ai.models.openai import OpenAIChatModel
     from pydantic_ai.providers.openai import OpenAIProvider
 
     settings = get_settings()
@@ -137,4 +137,4 @@ def get_flash_model():
         api_key=settings.openai_api_key,
         base_url=settings.openai_base_url,
     )
-    return OpenAIModel(settings.flash_model, provider=provider)
+    return OpenAIChatModel(settings.flash_model, provider=provider)
