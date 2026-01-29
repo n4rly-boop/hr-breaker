@@ -31,10 +31,10 @@ logger = setup_logging()
 class Settings(BaseModel):
     """Application settings."""
 
-    google_api_key: str = ""
-    gemini_pro_model: str = "gemini-3-pro-preview"
-    gemini_flash_model: str = "gemini-3-flash-preview"
-    gemini_thinking_budget: int | None = 8192
+    openai_api_key: str = ""
+    openai_base_url: str = "https://openrouter.ai/api/v1"
+    pro_model: str = "google/gemini-3-pro-preview"
+    flash_model: str = "google/gemini-3-flash-preview"
     cache_dir: Path = Path(".cache/resumes")
     output_dir: Path = Path("output")
     max_iterations: int = 5
@@ -75,15 +75,11 @@ class Settings(BaseModel):
 
 @lru_cache
 def get_settings() -> Settings:
-    thinking_env = os.getenv("GEMINI_THINKING_BUDGET")
-    thinking_budget: int | None = 8192
-    if thinking_env is not None:
-        thinking_budget = int(thinking_env) if thinking_env else None
     return Settings(
-        google_api_key=os.getenv("GOOGLE_API_KEY", ""),
-        gemini_pro_model=os.getenv("GEMINI_PRO_MODEL") or "gemini-3-pro-preview",
-        gemini_flash_model=os.getenv("GEMINI_FLASH_MODEL") or "gemini-3-flash-preview",
-        gemini_thinking_budget=thinking_budget,
+        openai_api_key=os.getenv("OPENAI_API_KEY", ""),
+        openai_base_url=os.getenv("OPENAI_BASE_URL", "https://openrouter.ai/api/v1"),
+        pro_model=os.getenv("PRO_MODEL") or "google/gemini-3-pro-preview",
+        flash_model=os.getenv("FLASH_MODEL") or "google/gemini-3-flash-preview",
         fast_mode=os.getenv("HR_BREAKER_FAST_MODE", "true").lower() in ("true", "1", "yes"),
         # Scraper settings
         scraper_httpx_timeout=float(os.getenv("SCRAPER_HTTPX_TIMEOUT", "15")),
@@ -114,12 +110,29 @@ def get_settings() -> Settings:
 
 
 def get_model_settings() -> dict[str, Any] | None:
-    """Get GoogleModelSettings with thinking config if budget is set."""
-    settings = get_settings()
-    if settings.gemini_thinking_budget is not None:
-        return {
-            "google_thinking_config": {
-                "thinking_budget": settings.gemini_thinking_budget
-            }
-        }
+    """Get model settings (currently none for OpenAI-compatible APIs)."""
     return None
+
+
+def get_pro_model():
+    """Get the pro model configured for OpenRouter."""
+    from pydantic_ai.models.openai import OpenAIModel
+
+    settings = get_settings()
+    return OpenAIModel(
+        settings.pro_model,
+        api_key=settings.openai_api_key,
+        base_url=settings.openai_base_url,
+    )
+
+
+def get_flash_model():
+    """Get the flash model configured for OpenRouter."""
+    from pydantic_ai.models.openai import OpenAIModel
+
+    settings = get_settings()
+    return OpenAIModel(
+        settings.flash_model,
+        api_key=settings.openai_api_key,
+        base_url=settings.openai_base_url,
+    )

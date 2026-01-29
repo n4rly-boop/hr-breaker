@@ -6,7 +6,7 @@ from pydantic import BaseModel
 from pydantic_ai import Agent, BinaryContent
 
 from hr_breaker.agents.combined_reviewer import pdf_to_image
-from hr_breaker.config import get_model_settings, get_settings
+from hr_breaker.config import get_model_settings, get_pro_model, get_settings
 from hr_breaker.filters.data_validator import validate_html
 from hr_breaker.filters.keyword_matcher import check_keywords
 from hr_breaker.models import (
@@ -101,7 +101,7 @@ def get_optimizer_agent(job: JobPosting, source: ResumeSource) -> Agent:
     resume_guide = _load_resume_guide()
     system_prompt = OPTIMIZER_PROMPT.format(resume_guide=resume_guide)
     agent = Agent(
-        f"google-gla:{settings.gemini_pro_model}",
+        get_pro_model(),
         output_type=OptimizerResult,
         system_prompt=system_prompt,
         model_settings=get_model_settings(),

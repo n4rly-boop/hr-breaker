@@ -115,8 +115,8 @@ with st.sidebar:
         st.caption("No PDFs yet")
 
     st.divider()
-    if not settings.google_api_key:
-        st.warning("Set GOOGLE_API_KEY in .env")
+    if not settings.openai_api_key:
+        st.warning("Set OPENAI_API_KEY in .env")
 
 # Main content
 st.markdown("### HR-Breaker")

@@ -19,7 +19,7 @@ Tool for optimizing resumes for job postings and passing automated filters.
 
 1. Streamlit frontend
 2. Pydantic-AI LLM agent framework
-3. Google Gemini models (configurable via env)
+3. OpenAI-compatible API (OpenRouter by default, configurable via env)
 4. Modular filter system - easy to add new checks
 5. Resume caching - input once, apply to many jobs
 
@@ -35,9 +35,8 @@ Pydantic-AI docs: https://ai.pydantic.dev/llms-full.txt
 
 When debugging use 1-2 iterations only (costs money). Use these settings:
 ```
-GEMINI_THINKING_BUDGET=1024
-GEMINI_PRO_MODEL=gemini-2.5-flash
-GEMINI_FLASH_MODEL=gemini-2.5-flash
+PRO_MODEL=google/gemini-2.5-flash
+FLASH_MODEL=google/gemini-2.5-flash
 ```
 
 ## Current Implementation

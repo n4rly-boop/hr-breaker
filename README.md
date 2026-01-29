@@ -33,7 +33,7 @@ uv sync
 
 # Configure
 cp .env.example .env
-# Edit .env and add your GOOGLE_API_KEY
+# Edit .env and add your api key
 
 # Run web UI
 uv run streamlit run src/hr_breaker/main.py

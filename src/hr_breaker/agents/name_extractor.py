@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from pydantic_ai import Agent
 
-from hr_breaker.config import get_model_settings, get_settings
+from hr_breaker.config import get_flash_model, get_model_settings, get_settings
 
 
 class ExtractedName(BaseModel):
@@ -25,7 +25,7 @@ async def extract_name(content: str) -> tuple[str | None, str | None]:
     """Extract first and last name from resume content using LLM."""
     settings = get_settings()
     agent = Agent(
-        f"google-gla:{settings.gemini_flash_model}",
+        get_flash_model(),
         output_type=ExtractedName,
         system_prompt=SYSTEM_PROMPT,
         model_settings=get_model_settings(),
