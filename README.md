@@ -1,25 +1,113 @@
 # HR-Breaker
 
-Resume optimization tool for job postings.
+Resume optimization tool that transforms any resume into a job-specific, ATS-friendly PDF.
 
-## Requirements
+![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)
 
-- Python 3.10+
-- pdflatex (texlive or miktex)
-- Google Gemini API key
+## Features
 
-## Installation
+- **Any format in** - LaTeX, plain text, markdown, HTML, PDF
+- **Optimized PDF out** - Single-page, professionally formatted
+- **LLM-powered optimization** - Tailors content to job requirements
+- **Multi-filter validation** - ATS simulation, keyword matching, hallucination detection
+- **Web UI + CLI** - Streamlit dashboard or command-line
+- **Debug mode** - Inspect optimization iterations
+
+## How It Works
+
+1. Upload resume in any text format (content source only)
+2. Provide job posting URL or text description
+3. LLM extracts content and generates optimized HTML resume
+4. System runs internal filters (ATS simulation, keyword matching, hallucination detection)
+5. If filters reject, regenerates using feedback
+6. When all checks pass, renders HTML→PDF via WeasyPrint
+
+## Quick Start
 
 ```bash
+# Install
 uv sync
+
+# Configure
+export GOOGLE_API_KEY=your-key
+
+# Run web UI
+uv run streamlit run src/hr_breaker/main.py
 ```
 
 ## Usage
 
-```bash
-# Set API key
-export GOOGLE_API_KEY=your-key
+### Web UI
 
-# Run
-uv run streamlit run src/hr_breaker/main.py
+Launch with `uv run streamlit run src/hr_breaker/main.py`
+
+1. Paste or upload resume
+2. Enter job URL or description
+3. Click optimize
+4. Download PDF
+
+### CLI
+
+```bash
+# From URL
+uv run hr-breaker optimize resume.txt https://example.com/job
+
+# From job description file
+uv run hr-breaker optimize resume.txt job.txt
+
+# Debug mode (saves iterations)
+uv run hr-breaker optimize resume.txt job.txt -d
+
+# List generated PDFs
+uv run hr-breaker list
 ```
+
+## Configuration
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `GOOGLE_API_KEY` | Yes | Google Gemini API key |
+| `GEMINI_PRO_MODEL` | No | Model for complex tasks (default: `gemini-2.5-pro`) |
+| `GEMINI_FLASH_MODEL` | No | Model for simple tasks (default: `gemini-2.5-flash`) |
+| `GEMINI_THINKING_BUDGET` | No | Thinking tokens budget |
+| `MAX_ITERATIONS` | No | Optimization loop limit (default: 5) |
+
+## Architecture
+
+```
+src/hr_breaker/
+├── agents/          # Pydantic-AI agents (optimizer, reviewer, etc.)
+├── filters/         # Validation plugins (ATS, keywords, hallucination)
+├── services/        # Rendering, scraping, caching
+│   └── scrapers/    # Job scraper implementations
+├── models/          # Pydantic data models
+├── orchestration.py # Core optimization loop
+├── main.py          # Streamlit UI
+└── cli.py           # Click CLI
+```
+
+**Agents**: job_parser, optimizer, reviewer, name_extractor, hallucination_detector, formatting_checker
+
+**Filters** (run by priority):
+1. ContentLengthChecker - Pre-render size check
+2. DataValidator - HTML structure validation
+3. FormattingChecker - Vision LLM + page count
+4. HallucinationChecker - Detect fabrications
+5. KeywordMatcher - TF-IDF matching
+6. LLMChecker / VectorSimilarityMatcher - ATS simulation
+
+## Development
+
+```bash
+# Run tests
+uv run pytest tests/
+
+# Install dev dependencies
+uv sync --group dev
+```
+
+## Output
+
+- Final PDFs: `output/<name>_<company>_<role>.pdf`
+- Debug iterations: `output/debug_<company>_<role>/`
+- Records: `output/index.json`
